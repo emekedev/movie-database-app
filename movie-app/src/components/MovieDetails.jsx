@@ -1,103 +1,45 @@
-// import { useEffect, useState } from "react";
-// import { fetchMovieDetails } from "../api/movieApi";
+import React, { useEffect, useState } from "react";
 
-// function MovieDetails({ movieId, onClose }) {
-//   const [movie, setMovie] = useState(null);
-
-//   useEffect(() => {
-//     const loadDetails = async () => {
-//       const data = await fetchMovieDetails(movieId);
-//        console.log("Fetched Movie Details:", data);
-//       setMovie(data);
-//     };
-//     loadDetails();
-//   }, [movieId]);
-
-//   if (!movie) {
-//     return <p className="text-center">Loading...</p>;
-//   }
-
-//   return (
-//     <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
-//       <div className="bg-white p-6 rounded-lg max-w-lg w-full relative shadow-lg overflow-y-auto max-h-[90vh]">
-//         {/* Close Button */}
-//         <button
-//           onClick={onClose}
-//           className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-//         >
-//           ✕
-//         </button>
-
-//         {/* Movie Poster */}
-//         <img
-//           src={movie.Poster !== "N/A" ? movie.Poster : "https://via.placeholder.com/300x450"}
-//           alt={movie.Title}
-//           className="w-full h-80 object-cover rounded mb-4"
-//         />
-
-//         {/* Movie Info */}
-//         <h2 className="text-2xl font-bold mb-2">{movie.Title}</h2>
-//         <p className="text-gray-600 italic mb-2">{movie.Year} • {movie.Runtime}</p>
-//         <p className="mb-4">{movie.Plot}</p>
-//         <p><strong>Actors:</strong> {movie.Actors}</p>
-//         <p><strong>Director:</strong> {movie.Director}</p>
-//         <p><strong>Genre:</strong> {movie.Genre}</p>
-//         <p><strong>IMDB Rating:</strong> ⭐ {movie.imdbRating}</p>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default MovieDetails;
-
-import { useEffect, useState } from "react";
-import { fetchMovieDetails } from "../api/movieApi";
-
-function MovieDetails({ movieId, onClose }) {
-  const [movie, setMovie] = useState(null);
+function MovieDetails({ movie, onClose }) {
+  const [details, setDetails] = useState(null);
+  const API_KEY = "thewdb";
 
   useEffect(() => {
-    const loadDetails = async () => {
-      const data = await fetchMovieDetails(movieId);
-      setMovie(data);
+    const fetchDetails = async () => {
+      try {
+        const res = await fetch(
+          `https://www.omdbapi.com/?i=${movie.imdbID}&apikey=${API_KEY}`
+        );
+        const data = await res.json();
+        setDetails(data);
+      } catch (error) {
+        console.error("Error fetching movie details:", error);
+      }
     };
-    loadDetails();
-  }, [movieId]);
 
-  if (!movie) {
-    return <p className="text-center">Loading...</p>;
-  }
+    fetchDetails();
+  }, [movie]);
+
+  if (!details) return <p>Loading...</p>;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg max-w-lg w-full relative shadow-lg overflow-y-auto max-h-[90vh]">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-        >
-          ✕
-        </button>
-
-        {/* Movie Poster */}
-        <img
-          src={movie.Poster !== "N/A" ? movie.Poster : "https://via.placeholder.com/300x450"}
-          alt={movie.Title}
-          className="w-full h-80 object-cover rounded mb-4"
-        />
-
-        {/* Movie Info */}
-        <h2 className="text-2xl font-bold mb-2">{movie.Title}</h2>
-        <p className="text-gray-600 italic mb-2">{movie.Year} • {movie.Runtime}</p>
-        <p className="mb-4">{movie.Plot}</p>
-        <p><strong>Actors:</strong> {movie.Actors}</p>
-        <p><strong>Director:</strong> {movie.Director}</p>
-        <p><strong>Genre:</strong> {movie.Genre}</p>
-        <p><strong>IMDB Rating:</strong> ⭐ {movie.imdbRating}</p>
-      </div>
+    <div style={{ marginTop: "20px" }}>
+      <button onClick={onClose} style={{ marginBottom: "20px" }}>
+        ⬅ Back
+      </button>
+      <h2>{details.Title} ({details.Year})</h2>
+      <img
+        src={details.Poster !== "N/A" ? details.Poster : "https://via.placeholder.com/300"}
+        alt={details.Title}
+        style={{ width: "200px", borderRadius: "10px", marginBottom: "20px" }}
+      />
+      <p><strong>Genre:</strong> {details.Genre}</p>
+      <p><strong>Plot:</strong> {details.Plot}</p>
+      <p><strong>Director:</strong> {details.Director}</p>
+      <p><strong>Actors:</strong> {details.Actors}</p>
+      <p><strong>IMDB Rating:</strong> {details.imdbRating}</p>
     </div>
   );
 }
 
 export default MovieDetails;
-
